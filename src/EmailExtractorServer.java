@@ -19,7 +19,7 @@ public class EmailExtractorServer {
                 portNumber = Integer.parseInt(args[0]);
             else
             {
-                System.err.println("Usage: java EchoUcaseServerTCP [<port number>]");
+                System.err.println("Usage: java EmailExtractorServerTCP [<port number>]");
                 System.exit(1);
             }
         }
