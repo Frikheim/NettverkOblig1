@@ -24,7 +24,7 @@ public class EmailExtractorServer {
             }
         }
 
-        System.out.println("Hi, I am EchoUCase TCP server");
+        System.out.println("Hi, I am EmailExtractor TCP server");
 
         // try() with resource makes sure that all the resources are automatically
         // closed whether there is any exception or not!!!

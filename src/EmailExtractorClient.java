@@ -12,7 +12,7 @@ public class EmailExtractorClient {
 
     public static void main(String[] args) throws IOException {
 
-        String hostName = "127.0.0.1"; // Default host, localhost
+        String hostName = "10.253.13.120"; // Default host, localhost
         int portNumber = 5555; // Default port to use
         if (args.length > 0) {
             hostName = args[0];
