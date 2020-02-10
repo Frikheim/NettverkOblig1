@@ -12,7 +12,7 @@ public class EmailExtractorClient {
 
     public static void main(String[] args) throws IOException {
 
-        String hostName = "10.253.13.120"; // Default host, localhost
+        String hostName = "10.253.17.245"; // IP-adressen til server
         int portNumber = 5555; // Default port to use
         if (args.length > 0) {
             hostName = args[0];
@@ -24,36 +24,32 @@ public class EmailExtractorClient {
                 }
             }
         }
-        System.out.println("Email Extractor, provide url with http/https!");
+        System.out.println("Email Extractor, Url med http/https!");
 
         try
             (
-                // create TCP socket for the given hostName, remote port PortNumber
+                // Lag socket
                 Socket clientSocket = new Socket(hostName, portNumber);
 
-                // Stream writer to the socket
+                // Stream writer til socketen
                 PrintWriter out =
                     new PrintWriter(clientSocket.getOutputStream(), true);
-                // Stream reader from the socket
+                // Stream reader til socketen
                 BufferedReader in =
-                    new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
+                    new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 // Keyboard input reader
-                BufferedReader stdIn =
-                    new BufferedReader(
-                        new InputStreamReader(System.in))
+                BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))
             )
         {
             String userInput;
-            // Loop until null input string
+            // Venter på input fra bruker
             System.out.print("I (Client) [" + InetAddress.getLocalHost()  + ":" + clientSocket.getLocalPort() + "] > ");
             while ((userInput = stdIn.readLine()) != null && !userInput.isEmpty())
             {
-                // write keyboard input to the socket
+                // skriver til socket
                 out.println(userInput);
 
-
-                // read from the socket and display
+                // Leser fra socket og viser data
                 String receivedText = in.readLine();
 
                 if(receivedText.equals("1")){
@@ -64,7 +60,6 @@ public class EmailExtractorClient {
                     while((receivedText = in.readLine()) != null){
                         System.out.println(receivedText);
                     }
-
                 }
                 System.out.println("Server [" + hostName +  ":" + portNumber + "] > " + receivedText);
                 System.out.print("I (Client) [" + clientSocket.getLocalAddress().getHostAddress() + ":" + clientSocket.getLocalPort() + "] > ");

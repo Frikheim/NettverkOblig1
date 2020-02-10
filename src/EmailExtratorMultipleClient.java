@@ -9,9 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EmailExtratorMultipleClient {
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
-        int portNumber = 5555; // Default port to use
+        int portNumber = 5555;
 
         if (args.length > 0)
         {
@@ -24,20 +24,18 @@ public class EmailExtratorMultipleClient {
             }
         }
 
-        System.out.println("Hi, I am the EmailExtractor Multi-client TCP server.");
+        System.out.println("EmailExtractor Multi-client TCP server.");
 
         try (
-                // Create server socket with the given port number
-                ServerSocket serverSocket =
-                        new ServerSocket(portNumber);
+                // Lager server socket
+                ServerSocket serverSocket = new ServerSocket(portNumber)
         )
         {
-            String receivedText;
-            // continuously listening for clients
+            // Venter på clienter
             while (true)
             {
-                // create and start a new ClientServer thread for each connected client
-                ClientService clientserver = new ClientService(serverSocket.accept());
+                // Starter en egen tråd for hver client
+                ClientThread clientserver = new ClientThread(serverSocket.accept());
                 clientserver.start();
             }
         } catch (IOException e)
@@ -51,16 +49,14 @@ public class EmailExtratorMultipleClient {
     }
 
 
-    /***
-     * This class serves a client in a separate thread
-     */
-    static class ClientService extends Thread
+   // Tråd klasse for klienter
+    static class ClientThread extends Thread
     {
         Socket connectSocket;
         InetAddress clientAddr;
         int serverPort, clientPort;
 
-        public ClientService(Socket connectSocket)
+        public ClientThread(Socket connectSocket)
         {
             this.connectSocket = connectSocket;
             clientAddr = connectSocket.getInetAddress();
@@ -71,25 +67,22 @@ public class EmailExtratorMultipleClient {
         public void run()
         {
             try (
-                    // Stream writer to the socket
-                    PrintWriter out =
-                            new PrintWriter(connectSocket.getOutputStream(), true);
-                    // Stream reader from the connection socket
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(connectSocket.getInputStream()));
+                    // Stream writer
+                    PrintWriter out = new PrintWriter(connectSocket.getOutputStream(), true);
+                    // Stream reader
+                    BufferedReader in = new BufferedReader(new InputStreamReader(connectSocket.getInputStream()))
             )
             {
-
                 String receivedText;
-                // read from the connection socket
+                // leser fra socket
                 while (((receivedText = in.readLine()) != null))
                 {
-                    // extract emails here
-                    URL url; //Store the url
+                    // extract emails
+                    URL url; //lagrer URL
                     StringBuilder contents;
                     String outText = "";
-                    String pattern = "\\b[æøåÆØÅa-zA-Z0-9.-]+@[æøåÆØÅa-zA-Z0-9.-]+\\.[æøåÆØÅa-zA-Z0-9.-]+\\b"; //Email Address Pattern
-                    Set<String> emailAddresses = new HashSet<>(); //Contains unique email addresses
+                    String pattern = "\\b[æøåÆØÅa-zA-Z0-9.-]+@[æøåÆØÅa-zA-Z0-9.-]+\\.[æøåÆØÅa-zA-Z0-9.-]+\\b"; //Email mønster
+                    Set<String> emailAddresses = new HashSet<>(); //Inneholder unike emails
 
                     try{
                         url = new URL(receivedText);
@@ -97,7 +90,7 @@ public class EmailExtratorMultipleClient {
                         BufferedReader inUrl = new BufferedReader(new InputStreamReader(url.openStream()));
                         contents = new StringBuilder();
 
-                        String input = "";
+                        String input;
                         while((input = inUrl.readLine()) != null) {
                             contents.append(input);
                         }
@@ -128,11 +121,12 @@ public class EmailExtratorMultipleClient {
                             }
                         }
                     }
-                    // Write the response message string to the connection socket
+                    // Skriver emails/ feilmelding til socket
+                    out.println(outText);
                     System.out.println("I (Server) [" + connectSocket.getLocalAddress().getHostAddress() + ":" + serverPort +"] > " + outText);
                 }
 
-                // close the connection socket
+                // Lukker socket
                 connectSocket.close();
 
             } catch (IOException e)

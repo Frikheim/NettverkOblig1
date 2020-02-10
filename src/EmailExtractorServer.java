@@ -9,9 +9,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EmailExtractorServer {
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
-        int portNumber = 5555; // Default port to use
+        int portNumber = 5555;
+
+        if (args.length > 0)
+        {
+            if (args.length == 1)
+                portNumber = Integer.parseInt(args[0]);
+            else
+            {
+                System.err.println("Usage: java EmailExtractorServerTCP [<port number>]");
+                System.exit(1);
+            }
+        }
 
         System.out.println("EmailExtractor TCP server");
 
@@ -25,23 +36,23 @@ public class EmailExtractorServer {
                 // Stream writer for socketen
                 PrintWriter out = new PrintWriter(connectSocket.getOutputStream(), true);
                 // Stream reader for socketen
-                BufferedReader in = new BufferedReader(new InputStreamReader(connectSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(connectSocket.getInputStream()))
         )
         {
             InetAddress clientAddr = connectSocket.getInetAddress();
             int clientPort = connectSocket.getPort();
             String receivedText;
-            // read from the connection socket
+            // leser fra socket
             while ((receivedText = in.readLine())!=null)
             {
                 System.out.println("Client [" + clientAddr.getHostAddress() +  ":" + clientPort +"] > " + receivedText);
 
-                // extract emails here
-                URL url; //Store the url
+                // extract emails
+                URL url; //Lagrer URL
                 StringBuilder contents;
                 String outText = "";
-                String pattern = "\\b[æøåÆØÅa-zA-Z0-9.-]+@[æøåÆØÅa-zA-Z0-9.-]+\\.[æøåÆØÅa-zA-Z0-9.-]+\\b"; //Email Address Pattern
-                Set<String> emailAddresses = new HashSet<>(); //Contains unique email addresses
+                String pattern = "\\b[æøåÆØÅa-zA-Z0-9.-]+@[æøåÆØÅa-zA-Z0-9.-]+\\.[æøåÆØÅa-zA-Z0-9.-]+\\b"; //Email mønster
+                Set<String> emailAddresses = new HashSet<>(); //Lagrer bare unike emails
 
                 try{
                     url = new URL(receivedText);
@@ -49,14 +60,14 @@ public class EmailExtractorServer {
                     BufferedReader inUrl = new BufferedReader(new InputStreamReader(url.openStream()));
                     contents = new StringBuilder();
 
-                    String input = "";
+                    String input;
                     while((input = inUrl.readLine()) != null) {
                         contents.append(input);
                     }
 
                     Pattern pat = Pattern.compile(pattern);
                     Matcher match = pat.matcher(contents);
-                    //If match found, append to emailAddresses
+                    //hvis den finner match, legger til i EmailAdresses
                     while(match.find()) {
                         emailAddresses.add(match.group());
                     }
@@ -78,20 +89,16 @@ public class EmailExtractorServer {
                         outText = "0 \n";
                         for (String email : emailAddresses) {
                             outText += email + "\n";
-                            System.out.println(email);
-                            System.out.println(outText);
                         }
                     }
-
-
                 }
 
-                // Write the response message string to the connection socket
+                // Skriver til socket
                 out.println(outText);
                 System.out.println("I (Server) [" + connectSocket.getLocalAddress().getHostAddress() + ":" + portNumber + "] > " + outText);
             }
 
-            System.out.println("I am done, Bye!");
+            System.out.println("Done");
         } catch (IOException e)
         {
             System.out.println("Exception caught when trying to listen on port "
