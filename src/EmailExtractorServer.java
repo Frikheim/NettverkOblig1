@@ -13,35 +13,19 @@ public class EmailExtractorServer {
     {
         int portNumber = 5555; // Default port to use
 
-        if (args.length > 0)
-        {
-            if (args.length == 1)
-                portNumber = Integer.parseInt(args[0]);
-            else
-            {
-                System.err.println("Usage: java EmailExtractorServerTCP [<port number>]");
-                System.exit(1);
-            }
-        }
+        System.out.println("EmailExtractor TCP server");
 
-        System.out.println("Hi, I am EmailExtractor TCP server");
-
-        // try() with resource makes sure that all the resources are automatically
-        // closed whether there is any exception or not!!!
+        //Prøver å åpne server socket
         try (
-                // Create server socket with the given port number
-                ServerSocket serverSocket =
-                        new ServerSocket(portNumber);
-                // create connection socket, server begins listening
-                // for incoming TCP requests
+                // Lager ny server socket med portnummeret
+                ServerSocket serverSocket = new ServerSocket(portNumber);
+                // Venter på tcp client
                 Socket connectSocket = serverSocket.accept();
 
-                // Stream writer to the connection socket
-                PrintWriter out =
-                        new PrintWriter(connectSocket.getOutputStream(), true);
-                // Stream reader from the connection socket
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(connectSocket.getInputStream()));
+                // Stream writer for socketen
+                PrintWriter out = new PrintWriter(connectSocket.getOutputStream(), true);
+                // Stream reader for socketen
+                BufferedReader in = new BufferedReader(new InputStreamReader(connectSocket.getInputStream()));
         )
         {
             InetAddress clientAddr = connectSocket.getInetAddress();
