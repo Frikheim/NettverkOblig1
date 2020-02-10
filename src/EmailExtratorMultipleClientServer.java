@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EmailExtratorMultipleClient {
+public class EmailExtratorMultipleClientServer {
     public static void main(String[] args)
     {
         int portNumber = 5555;
